@@ -71,7 +71,8 @@ install_apt_base() {
     libx11-dev \
     libxext-dev \
     libxrender-dev \
-    libpng-dev
+    libpng-dev \
+    libonig-dev
 }
 
 install_gh() {
@@ -168,8 +169,8 @@ install_silicon() {
   fi
 
   if have cargo; then
-    log "Installing silicon with cargo"
-    cargo install silicon --locked
+    log "Installing silicon v0.5.3 from GitHub"
+    cargo install --git https://github.com/Aloxaf/silicon --tag v0.5.3 --locked
   else
     warn "Rust cargo is not installed, so silicon could not be installed. Add Rust to package versions or install silicon another way."
   fi

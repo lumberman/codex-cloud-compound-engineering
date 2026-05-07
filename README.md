@@ -60,7 +60,7 @@ bash verify.sh
 - The Compound Engineering plugin conversion writes to `~/.codex/prompts` and `~/.codex/skills` inside the cloud container.
 - The `ast-grep` agent skill is installed to `~/.agents/skills/ast-grep`.
 - `vhs` is installed through Go.
-- `silicon` is installed through Cargo. If Cargo is missing, the script installs a minimal Rust toolchain with `rustup`.
+- `silicon` is installed from the upstream GitHub `v0.5.3` tag through Cargo. If Cargo is missing, the script installs a minimal Rust toolchain with `rustup`.
 - If `agent-browser install` fails in setup, normal coding still works, but browser screenshot/reel workflows may need a follow-up environment tweak.
 
 ## Official References
