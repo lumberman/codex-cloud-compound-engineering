@@ -198,7 +198,7 @@ install_compound_engineering() {
 }
 
 install_ce_shell_hint() {
-  log "Installing Compound Engineering shell hint"
+  log "Installing Compound Engineering compatibility CLI"
 
   local bin_dir="$HOME/.local/bin"
   local helper
@@ -214,22 +214,156 @@ install_ce_shell_hint() {
 #!/usr/bin/env bash
 set -euo pipefail
 
-cat <<'MSG'
-Compound Engineering is installed for Codex as skills/prompts, not as a shell CLI.
+export PATH="$HOME/.local/bin:$HOME/.bun/bin:$HOME/.npm-global/bin:$HOME/go/bin:$HOME/.cargo/bin:$PATH"
 
-Use the installed Codex skills by name in the agent context, for example:
+usage() {
+  cat <<'MSG'
+Compound Engineering compatibility CLI for Codex Cloud
+
+Compound Engineering is installed for Codex as skills/prompts. This helper
+exists so terminal checks have a useful interface, but CE workflows still run
+through the Codex agent skill system.
+
+Commands:
+  ce help                 Show this help
+  ce list                 List expected Compound Engineering skill names
+  ce verify               Check helper tools and the Codex plugin marker
+  ce plan                 Print the Codex skill to invoke for planning
+  ce work                 Print the Codex skill to invoke for implementation
+  ce review               Print the Codex skill to invoke for review
+  ce compound             Print the Codex skill to invoke for learnings capture
+  ce debug                Print the Codex skill to invoke for debugging
+  ce setup                Print setup verification guidance
+
+Alias commands such as ce:plan and ce:work route here too.
+MSG
+}
+
+normalize_command() {
+  local invoked
+  invoked="$(basename "$0")"
+
+  case "$invoked" in
+    ce:plan) echo "plan"; return ;;
+    ce:work) echo "work"; return ;;
+    ce:review|ce:code-review) echo "review"; return ;;
+    ce:compound) echo "compound"; return ;;
+    ce:debug) echo "debug"; return ;;
+    ce:setup) echo "setup"; return ;;
+  esac
+
+  echo "${1:-help}"
+}
+
+skill_message() {
+  local command="$1"
+  local skill="$2"
+  cat <<MSG
+Compound Engineering command requested: ce ${command}
+
+Use the Codex skill in the agent context:
+  ${skill}
+
+This shell helper cannot invoke a Codex skill directly from Bash. Ask the
+Codex Cloud agent to use "${skill}" for this task.
+MSG
+}
+
+compound_engineering_installed() {
+  [ -f "$HOME/.codex/.compound-engineering-installed" ] \
+    || [ -f "$HOME/.codex/plugins/compound-engineering/.codex-plugin/plugin.json" ] \
+    || [ -f "$HOME/.codex/plugins/compound-engineering/plugin.json" ] \
+    || [ -f "$HOME/.codex/skills/compound-engineering/ce-setup/SKILL.md" ] \
+    || [ -f "$HOME/.codex/skills/ce-setup/SKILL.md" ] \
+    || [ -f "$HOME/.codex/prompts/ce-setup.md" ] \
+    || find "$HOME/.codex" -maxdepth 6 -type f \( -path '*/compound-engineering/*/ce-setup/SKILL.md' -o -path '*/compound-engineering/.codex-plugin/plugin.json' \) 2>/dev/null | grep -q .
+}
+
+verify() {
+  local missing=0
+
+  for tool in agent-browser gh jq vhs silicon ffmpeg ast-grep; do
+    if command -v "$tool" >/dev/null 2>&1; then
+      printf 'OK   %-26s %s\n' "$tool" "$(command -v "$tool")"
+    else
+      printf 'MISS %-26s\n' "$tool"
+      missing=1
+    fi
+  done
+
+  if [ -f "$HOME/.agents/skills/ast-grep/SKILL.md" ]; then
+    printf 'OK   %-26s %s\n' "ast-grep skill" "$HOME/.agents/skills/ast-grep/SKILL.md"
+  else
+    printf 'MISS %-26s\n' "ast-grep skill"
+    missing=1
+  fi
+
+  if compound_engineering_installed; then
+    printf 'OK   %-26s %s\n' "compound-engineering" "$HOME/.codex"
+  else
+    printf 'MISS %-26s\n' "compound-engineering"
+    missing=1
+  fi
+
+  return "$missing"
+}
+
+cmd="$(normalize_command "$@")"
+
+case "$cmd" in
+  help|-h|--help)
+    usage
+    ;;
+  list)
+    cat <<'MSG'
+Expected Compound Engineering Codex skills:
+  ce-brainstorm
   ce-plan
   ce-work
   ce-code-review
   ce-debug
+  ce-commit
+  ce-commit-push-pr
   ce-compound
+  ce-demo-reel
+  ce-test-browser
+  ce-proof
   lfg
-
-Do not verify Compound Engineering by looking for pnpm ce:* scripts or by
-running a real `ce` executable. Those are not part of the Codex install shape.
-
-To verify helper tools, run the environment verify script from this setup kit.
 MSG
+    ;;
+  verify|doctor|check)
+    verify
+    ;;
+  plan)
+    skill_message "plan" "ce-plan"
+    ;;
+  work)
+    skill_message "work" "ce-work"
+    ;;
+  review|code-review)
+    skill_message "review" "ce-code-review"
+    ;;
+  compound)
+    skill_message "compound" "ce-compound"
+    ;;
+  debug)
+    skill_message "debug" "ce-debug"
+    ;;
+  setup)
+    cat <<'MSG'
+Run:
+  ce verify
+
+If tools are missing, rerun the Codex Cloud setup script from:
+  https://github.com/lumberman/codex-cloud-compound-engineering
+MSG
+    ;;
+  *)
+    printf 'Unknown Compound Engineering command: %s\n\n' "$cmd" >&2
+    usage >&2
+    exit 2
+    ;;
+esac
 EOF
 
   chmod +x "$helper"
@@ -277,9 +411,9 @@ verify() {
   fi
 
   if have ce; then
-    printf 'OK   ce shell hint -> %s\n' "$(command -v ce)"
+    printf 'OK   ce compatibility CLI -> %s\n' "$(command -v ce)"
   else
-    printf 'MISS ce shell hint\n'
+    printf 'MISS ce compatibility CLI\n'
     missing=1
   fi
 

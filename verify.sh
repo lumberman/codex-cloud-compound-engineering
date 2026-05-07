@@ -39,9 +39,9 @@ else
 fi
 
 if command -v ce >/dev/null 2>&1; then
-  printf 'OK   %-14s %s\n' "ce shell hint" "$(command -v ce)"
+  printf 'OK   %-14s %s\n' "ce CLI" "$(command -v ce)"
 else
-  printf 'MISS %-14s\n' "ce shell hint"
+  printf 'MISS %-14s\n' "ce CLI"
   missing=1
 fi
 
