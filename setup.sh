@@ -51,8 +51,8 @@ append_once() {
   fi
 }
 
-export PATH="$HOME/.bun/bin:$HOME/.npm-global/bin:$HOME/go/bin:$HOME/.cargo/bin:$PATH"
-append_once 'export PATH="$HOME/.bun/bin:$HOME/.npm-global/bin:$HOME/go/bin:$HOME/.cargo/bin:$PATH"' "$HOME/.bashrc"
+export PATH="$HOME/.local/bin:$HOME/.bun/bin:$HOME/.npm-global/bin:$HOME/go/bin:$HOME/.cargo/bin:$PATH"
+append_once 'export PATH="$HOME/.local/bin:$HOME/.bun/bin:$HOME/.npm-global/bin:$HOME/go/bin:$HOME/.cargo/bin:$PATH"' "$HOME/.bashrc"
 
 install_apt_base() {
   if ! have apt-get; then
@@ -197,6 +197,59 @@ install_compound_engineering() {
   printf 'installed_at=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$HOME/.codex/.compound-engineering-installed"
 }
 
+install_ce_shell_hint() {
+  log "Installing Compound Engineering shell hint"
+
+  local bin_dir="$HOME/.local/bin"
+  local helper
+  helper="$(mktemp)"
+
+  if [ "$(id -u)" -eq 0 ] || have sudo; then
+    bin_dir="/usr/local/bin"
+  fi
+
+  mkdir -p "$HOME/.local/bin"
+
+  cat > "$helper" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+cat <<'MSG'
+Compound Engineering is installed for Codex as skills/prompts, not as a shell CLI.
+
+Use the installed Codex skills by name in the agent context, for example:
+  ce-plan
+  ce-work
+  ce-code-review
+  ce-debug
+  ce-compound
+  lfg
+
+Do not verify Compound Engineering by looking for pnpm ce:* scripts or by
+running a real `ce` executable. Those are not part of the Codex install shape.
+
+To verify helper tools, run the environment verify script from this setup kit.
+MSG
+EOF
+
+  chmod +x "$helper"
+
+  if [ "$bin_dir" = "/usr/local/bin" ]; then
+    as_root mkdir -p "$bin_dir"
+    as_root install -m 0755 "$helper" "$bin_dir/ce"
+    for alias in ce:plan ce:work ce:review ce:compound ce:code-review ce:debug ce:setup; do
+      as_root ln -sf "$bin_dir/ce" "$bin_dir/$alias"
+    done
+  else
+    install -m 0755 "$helper" "$bin_dir/ce"
+    for alias in ce:plan ce:work ce:review ce:compound ce:code-review ce:debug ce:setup; do
+      ln -sf "$bin_dir/ce" "$bin_dir/$alias"
+    done
+  fi
+
+  rm -f "$helper"
+}
+
 verify() {
   log "Verifying Compound Engineering tools"
   local missing=0
@@ -223,6 +276,13 @@ verify() {
     missing=1
   fi
 
+  if have ce; then
+    printf 'OK   ce shell hint -> %s\n' "$(command -v ce)"
+  else
+    printf 'MISS ce shell hint\n'
+    missing=1
+  fi
+
   return "$missing"
 }
 
@@ -233,6 +293,7 @@ main() {
   install_vhs
   install_silicon
   install_compound_engineering
+  install_ce_shell_hint
   verify
 }
 

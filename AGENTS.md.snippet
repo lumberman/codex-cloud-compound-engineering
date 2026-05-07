@@ -10,6 +10,10 @@
   - `ce-debug` for bug investigation and root-cause work.
   - `ce-commit` or `ce-commit-push-pr` for git handoff work.
   - `ce-demo-reel`, `ce-test-browser`, or `ce-proof` when visual/user-facing proof is requested.
+- Compound Engineering is installed in Codex Cloud as Codex skills/prompts, not as a shell CLI and not as repo `pnpm ce:*` scripts.
+- Do not conclude Compound Engineering is unavailable just because `package.json` has no `ce:*` scripts.
+- Do not try to execute the workflow by running `ce`, `ce:plan`, or `pnpm ce:plan` in the terminal. Those shell commands are only compatibility hints in this environment.
+- To use Compound Engineering, invoke the matching Codex skill directly in the agent context.
 - Prefer the repository's existing patterns and validation commands over generic defaults.
 - When a Compound Engineering skill asks for missing tools, first run:
 

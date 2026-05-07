@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export PATH="$HOME/.bun/bin:$HOME/.npm-global/bin:$HOME/go/bin:$HOME/.cargo/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.bun/bin:$HOME/.npm-global/bin:$HOME/go/bin:$HOME/.cargo/bin:$PATH"
 
 missing=0
 
@@ -35,6 +35,13 @@ if compound_engineering_installed; then
   printf 'OK   %-14s %s\n' "CE plugin" "$HOME/.codex"
 else
   printf 'MISS %-14s\n' "CE plugin"
+  missing=1
+fi
+
+if command -v ce >/dev/null 2>&1; then
+  printf 'OK   %-14s %s\n' "ce shell hint" "$(command -v ce)"
+else
+  printf 'MISS %-14s\n' "ce shell hint"
   missing=1
 fi
 

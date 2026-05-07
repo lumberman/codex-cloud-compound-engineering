@@ -13,6 +13,7 @@ It installs:
 - `ffmpeg`
 - `ast-grep`
 - the `ast-grep` agent skill
+- a `ce` shell hint command so terminal checks explain that CE is exposed as Codex skills, not a real shell CLI
 
 ## Use In Codex Cloud
 
@@ -46,7 +47,7 @@ rm -rf "$TMP_DIR"
 bash maintenance.sh
 ```
 
-7. Add the contents of `AGENTS.md.snippet` to your repository root `AGENTS.md`.
+7. Add the contents of `AGENTS.md.snippet` to your repository root `AGENTS.md`. This is important: it tells Codex Cloud agents that Compound Engineering is exposed as Codex skills/prompts, not as `ce` shell commands or `pnpm ce:*` scripts.
 8. Start a Codex Cloud task and run this from the task terminal if you want to verify the environment:
 
 ```bash
@@ -58,6 +59,8 @@ bash verify.sh
 - Codex Cloud setup scripts run with internet access. The agent phase has internet off by default unless you enable it in the environment settings.
 - Setup scripts run in a separate Bash session, so the script appends PATH updates to `~/.bashrc`.
 - The Compound Engineering plugin conversion writes to `~/.codex/prompts` and `~/.codex/skills` inside the cloud container.
+- Compound Engineering workflows are invoked as Codex skills/prompts in the agent context. They are not installed as real shell commands or `pnpm ce:*` package scripts.
+- The setup installs a small `ce` shell hint command, plus `ce:plan`/`ce:work` style aliases, only to prevent misleading `command not found` checks. These aliases explain the correct Codex skill interface; they do not run the CE workflows themselves.
 - The `ast-grep` agent skill is installed to `~/.agents/skills/ast-grep`.
 - `vhs` is installed through Go.
 - `silicon` is installed from the upstream GitHub `v0.5.3` tag through Cargo. The setup installs the XCB, fontconfig, freetype, harfbuzz, png, and oniguruma development libraries it needs on Debian/Ubuntu images.
