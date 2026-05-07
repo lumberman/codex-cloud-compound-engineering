@@ -2,6 +2,7 @@
 set -euo pipefail
 
 export PATH="$HOME/.local/bin:$HOME/.bun/bin:$HOME/.npm-global/bin:$HOME/go/bin:$HOME/.cargo/bin:$PATH"
+export NODE_PATH="$HOME/.npm-global/lib/node_modules:${NODE_PATH:-}"
 
 missing=0
 
@@ -23,6 +24,13 @@ for tool in agent-browser gh jq vhs silicon ffmpeg ast-grep; do
     missing=1
   fi
 done
+
+if node -e 'require("playwright")' >/dev/null 2>&1; then
+  printf 'OK   %-14s %s\n' "playwright" "$HOME/.npm-global/lib/node_modules/playwright"
+else
+  printf 'MISS %-14s\n' "playwright"
+  missing=1
+fi
 
 if [ -f "$HOME/.agents/skills/ast-grep/SKILL.md" ]; then
   printf 'OK   %-14s %s\n' "ast-grep skill" "$HOME/.agents/skills/ast-grep/SKILL.md"

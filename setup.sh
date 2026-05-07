@@ -52,7 +52,9 @@ append_once() {
 }
 
 export PATH="$HOME/.local/bin:$HOME/.bun/bin:$HOME/.npm-global/bin:$HOME/go/bin:$HOME/.cargo/bin:$PATH"
+export NODE_PATH="$HOME/.npm-global/lib/node_modules:${NODE_PATH:-}"
 append_once 'export PATH="$HOME/.local/bin:$HOME/.bun/bin:$HOME/.npm-global/bin:$HOME/go/bin:$HOME/.cargo/bin:$PATH"' "$HOME/.bashrc"
+append_once 'export NODE_PATH="$HOME/.npm-global/lib/node_modules:${NODE_PATH:-}"' "$HOME/.bashrc"
 
 install_apt_base() {
   if ! have apt-get; then
@@ -124,6 +126,16 @@ install_node_tools() {
   if ! have agent-browser; then
     log "Installing agent-browser"
     npm install -g agent-browser --no-audit --no-fund --loglevel=error
+  fi
+
+  if ! node -e 'require("playwright")' >/dev/null 2>&1; then
+    log "Installing Playwright globally"
+    npm install -g playwright --no-audit --no-fund --loglevel=error
+  fi
+
+  if have playwright; then
+    log "Installing Playwright Chromium runtime"
+    playwright install chromium || warn "playwright install chromium failed. Prefer agent-browser for screenshot proof."
   fi
 
   if have agent-browser; then
@@ -228,6 +240,7 @@ Commands:
   ce help                 Show this help
   ce list                 List expected Compound Engineering skill names
   ce verify               Check helper tools and the Codex plugin marker
+  ce brainstorm           Print the Codex skill to invoke for brainstorming
   ce plan                 Print the Codex skill to invoke for planning
   ce work                 Print the Codex skill to invoke for implementation
   ce review               Print the Codex skill to invoke for review
@@ -245,6 +258,7 @@ normalize_command() {
 
   case "$invoked" in
     ce:plan) echo "plan"; return ;;
+    ce:brainstorm) echo "brainstorm"; return ;;
     ce:work) echo "work"; return ;;
     ce:review|ce:code-review) echo "review"; return ;;
     ce:compound) echo "compound"; return ;;
@@ -337,6 +351,9 @@ MSG
   plan)
     skill_message "plan" "ce-plan"
     ;;
+  brainstorm)
+    skill_message "brainstorm" "ce-brainstorm"
+    ;;
   work)
     skill_message "work" "ce-work"
     ;;
@@ -371,12 +388,12 @@ EOF
   if [ "$bin_dir" = "/usr/local/bin" ]; then
     as_root mkdir -p "$bin_dir"
     as_root install -m 0755 "$helper" "$bin_dir/ce"
-    for alias in ce:plan ce:work ce:review ce:compound ce:code-review ce:debug ce:setup; do
+    for alias in ce:brainstorm ce:plan ce:work ce:review ce:compound ce:code-review ce:debug ce:setup; do
       as_root ln -sf "$bin_dir/ce" "$bin_dir/$alias"
     done
   else
     install -m 0755 "$helper" "$bin_dir/ce"
-    for alias in ce:plan ce:work ce:review ce:compound ce:code-review ce:debug ce:setup; do
+    for alias in ce:brainstorm ce:plan ce:work ce:review ce:compound ce:code-review ce:debug ce:setup; do
       ln -sf "$bin_dir/ce" "$bin_dir/$alias"
     done
   fi
@@ -395,6 +412,13 @@ verify() {
       missing=1
     fi
   done
+
+  if node -e 'require("playwright")' >/dev/null 2>&1; then
+    printf 'OK   playwright node module available\n'
+  else
+    printf 'MISS playwright node module\n'
+    missing=1
+  fi
 
   if [ -f "$HOME/.agents/skills/ast-grep/SKILL.md" ]; then
     printf 'OK   ast-grep skill -> %s\n' "$HOME/.agents/skills/ast-grep/SKILL.md"
