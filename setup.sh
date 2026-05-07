@@ -68,6 +68,9 @@ install_apt_base() {
     libfreetype6-dev \
     libharfbuzz-dev \
     libxcb1-dev \
+    libxcb-render0-dev \
+    libxcb-shape0-dev \
+    libxcb-xfixes0-dev \
     libx11-dev \
     libxext-dev \
     libxrender-dev \
