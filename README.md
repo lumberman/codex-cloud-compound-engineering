@@ -30,14 +30,24 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/lumberman/codex-cloud-co
 bash setup.sh
 ```
 
-5. In the optional maintenance script field, paste `maintenance.sh`, or use:
+5. In the optional maintenance script field, use this bootstrap command to pull the maintenance script from GitHub:
+
+```bash
+TMP_DIR="$(mktemp -d)"
+curl -fsSL "https://github.com/lumberman/codex-cloud-compound-engineering/archive/main.tar.gz" \
+  | tar -xz -C "$TMP_DIR" --strip-components=1
+bash "$TMP_DIR/maintenance.sh"
+rm -rf "$TMP_DIR"
+```
+
+6. If you commit/copy this kit into a repo instead, you can use:
 
 ```bash
 bash maintenance.sh
 ```
 
-6. Add the contents of `AGENTS.md.snippet` to your repository root `AGENTS.md`.
-7. Start a Codex Cloud task and run this from the task terminal if you want to verify the environment:
+7. Add the contents of `AGENTS.md.snippet` to your repository root `AGENTS.md`.
+8. Start a Codex Cloud task and run this from the task terminal if you want to verify the environment:
 
 ```bash
 bash verify.sh
