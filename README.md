@@ -62,7 +62,7 @@ bash verify.sh
 - The Compound Engineering plugin conversion writes to `~/.codex/prompts` and `~/.codex/skills` inside the cloud container.
 - Compound Engineering workflows are invoked as Codex skills/prompts in the agent context. They are not installed as real shell commands or `pnpm ce:*` package scripts.
 - The setup installs Playwright globally and exports `NODE_PATH` so simple checks like `node -e 'require("playwright")'` can resolve it.
-- The setup installs a small `ce` compatibility CLI, plus `ce:brainstorm`/`ce:plan`/`ce:work` style aliases. `ce verify` checks tools, `ce list` lists expected skills, and `ce brainstorm`/`ce plan`/`ce work` print the Codex skill to invoke. The CLI does not run the CE workflows itself.
+- The setup installs a small `ce` compatibility CLI, plus `ce:*` aliases for the installed Compound Engineering skill names. `ce verify` checks tools, `ce list` lists expected skills, and commands like `ce brainstorm`, `ce plan`, or `ce:doc-review` print the Codex skill to invoke. The CLI does not run the CE workflows itself.
 - The `ast-grep` agent skill is installed to `~/.agents/skills/ast-grep`.
 - `vhs` is installed through Go.
 - `silicon` is installed from the upstream GitHub `v0.5.3` tag through Cargo. The setup installs the XCB, fontconfig, freetype, harfbuzz, png, and oniguruma development libraries it needs on Debian/Ubuntu images.

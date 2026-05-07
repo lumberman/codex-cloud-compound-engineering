@@ -12,7 +12,7 @@
   - `ce-demo-reel`, `ce-test-browser`, or `ce-proof` when visual/user-facing proof is requested.
 - Compound Engineering is installed in Codex Cloud as Codex skills/prompts, not as a shell CLI and not as repo `pnpm ce:*` scripts.
 - Do not conclude Compound Engineering is unavailable just because `package.json` has no `ce:*` scripts.
-- The `ce` terminal command, if present, is a compatibility CLI for checks and guidance. `ce verify` checks tools; `ce brainstorm`/`ce plan`/`ce work` print the Codex skill to invoke. It does not execute the workflow itself.
+- The `ce` terminal command, if present, is a compatibility CLI for checks and guidance. `ce verify` checks tools; `ce brainstorm`/`ce plan`/`ce work` and `ce:*` aliases print the Codex skill to invoke. It does not execute the workflow itself.
 - Do not try to execute the workflow by running `pnpm ce:plan`; repo package scripts are not part of the Codex install shape.
 - To use Compound Engineering, invoke the matching Codex skill directly in the agent context.
 - Prefer the repository's existing patterns and validation commands over generic defaults.

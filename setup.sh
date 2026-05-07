@@ -256,15 +256,10 @@ normalize_command() {
   local invoked
   invoked="$(basename "$0")"
 
-  case "$invoked" in
-    ce:plan) echo "plan"; return ;;
-    ce:brainstorm) echo "brainstorm"; return ;;
-    ce:work) echo "work"; return ;;
-    ce:review|ce:code-review) echo "review"; return ;;
-    ce:compound) echo "compound"; return ;;
-    ce:debug) echo "debug"; return ;;
-    ce:setup) echo "setup"; return ;;
-  esac
+  if [[ "$invoked" == ce:* ]]; then
+    echo "${invoked#ce:}"
+    return
+  fi
 
   echo "${1:-help}"
 }
@@ -281,6 +276,32 @@ Use the Codex skill in the agent context:
 This shell helper cannot invoke a Codex skill directly from Bash. Ask the
 Codex Cloud agent to use "${skill}" for this task.
 MSG
+}
+
+skill_for_command() {
+  local command="$1"
+
+  case "$command" in
+    review) echo "ce-code-review" ;;
+    compound-refresh) echo "ce-compound-refresh" ;;
+    commit-push-pr) echo "ce-commit-push-pr" ;;
+    demo-reel) echo "ce-demo-reel" ;;
+    doc-review) echo "ce-doc-review" ;;
+    frontend-design) echo "ce-frontend-design" ;;
+    release-notes) echo "ce-release-notes" ;;
+    resolve-pr-feedback) echo "ce-resolve-pr-feedback" ;;
+    session-extract) echo "ce-session-extract" ;;
+    session-inventory) echo "ce-session-inventory" ;;
+    simplify-code) echo "ce-simplify-code" ;;
+    slack-research) echo "ce-slack-research" ;;
+    test-browser) echo "ce-test-browser" ;;
+    test-xcode) echo "ce-test-xcode" ;;
+    code-review|agent-native-architecture|agent-native-audit|brainstorm|clean-gone-branches|commit|compound|debug|dhh-rails-style|gemini-imagegen|ideate|optimize|plan|polish-beta|product-pulse|proof|report-bug|riffrec-feedback-analysis|sessions|setup|strategy|work|work-beta|worktree)
+      echo "ce-${command}"
+      ;;
+    lfg) echo "lfg" ;;
+    *) return 1 ;;
+  esac
 }
 
 compound_engineering_installed() {
@@ -331,17 +352,39 @@ case "$cmd" in
   list)
     cat <<'MSG'
 Expected Compound Engineering Codex skills:
+  ce-agent-native-architecture
+  ce-agent-native-audit
   ce-brainstorm
+  ce-clean-gone-branches
   ce-plan
   ce-work
+  ce-work-beta
   ce-code-review
   ce-debug
   ce-commit
   ce-commit-push-pr
   ce-compound
+  ce-compound-refresh
   ce-demo-reel
+  ce-doc-review
+  ce-frontend-design
+  ce-ideate
+  ce-optimize
+  ce-product-pulse
   ce-test-browser
+  ce-test-xcode
   ce-proof
+  ce-release-notes
+  ce-report-bug
+  ce-resolve-pr-feedback
+  ce-session-extract
+  ce-session-inventory
+  ce-sessions
+  ce-setup
+  ce-simplify-code
+  ce-slack-research
+  ce-strategy
+  ce-worktree
   lfg
 MSG
     ;;
@@ -371,14 +414,22 @@ MSG
 Run:
   ce verify
 
+To use the actual Compound Engineering setup workflow, ask the Codex Cloud
+agent to use the Codex skill:
+  ce-setup
+
 If tools are missing, rerun the Codex Cloud setup script from:
   https://github.com/lumberman/codex-cloud-compound-engineering
 MSG
     ;;
   *)
-    printf 'Unknown Compound Engineering command: %s\n\n' "$cmd" >&2
-    usage >&2
-    exit 2
+    if skill="$(skill_for_command "$cmd")"; then
+      skill_message "$cmd" "$skill"
+    else
+      printf 'Unknown Compound Engineering command: %s\n\n' "$cmd" >&2
+      usage >&2
+      exit 2
+    fi
     ;;
 esac
 EOF
@@ -388,12 +439,12 @@ EOF
   if [ "$bin_dir" = "/usr/local/bin" ]; then
     as_root mkdir -p "$bin_dir"
     as_root install -m 0755 "$helper" "$bin_dir/ce"
-    for alias in ce:brainstorm ce:plan ce:work ce:review ce:compound ce:code-review ce:debug ce:setup; do
+    for alias in ce:agent-native-architecture ce:agent-native-audit ce:brainstorm ce:clean-gone-branches ce:plan ce:work ce:work-beta ce:review ce:code-review ce:debug ce:commit ce:commit-push-pr ce:compound ce:compound-refresh ce:demo-reel ce:dhh-rails-style ce:doc-review ce:frontend-design ce:gemini-imagegen ce:ideate ce:optimize ce:polish-beta ce:product-pulse ce:proof ce:release-notes ce:report-bug ce:resolve-pr-feedback ce:riffrec-feedback-analysis ce:session-extract ce:session-inventory ce:sessions ce:setup ce:simplify-code ce:slack-research ce:strategy ce:test-browser ce:test-xcode ce:worktree; do
       as_root ln -sf "$bin_dir/ce" "$bin_dir/$alias"
     done
   else
     install -m 0755 "$helper" "$bin_dir/ce"
-    for alias in ce:brainstorm ce:plan ce:work ce:review ce:compound ce:code-review ce:debug ce:setup; do
+    for alias in ce:agent-native-architecture ce:agent-native-audit ce:brainstorm ce:clean-gone-branches ce:plan ce:work ce:work-beta ce:review ce:code-review ce:debug ce:commit ce:commit-push-pr ce:compound ce:compound-refresh ce:demo-reel ce:dhh-rails-style ce:doc-review ce:frontend-design ce:gemini-imagegen ce:ideate ce:optimize ce:polish-beta ce:product-pulse ce:proof ce:release-notes ce:report-bug ce:resolve-pr-feedback ce:riffrec-feedback-analysis ce:session-extract ce:session-inventory ce:sessions ce:setup ce:simplify-code ce:slack-research ce:strategy ce:test-browser ce:test-xcode ce:worktree; do
       ln -sf "$bin_dir/ce" "$bin_dir/$alias"
     done
   fi
