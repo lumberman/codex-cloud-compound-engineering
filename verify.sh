@@ -5,6 +5,15 @@ export PATH="$HOME/.bun/bin:$HOME/.npm-global/bin:$HOME/go/bin:$HOME/.cargo/bin:
 
 missing=0
 
+compound_engineering_installed() {
+  [ -f "$HOME/.codex/plugins/compound-engineering/.codex-plugin/plugin.json" ] \
+    || [ -f "$HOME/.codex/plugins/compound-engineering/plugin.json" ] \
+    || [ -f "$HOME/.codex/skills/compound-engineering/ce-setup/SKILL.md" ] \
+    || [ -f "$HOME/.codex/skills/ce-setup/SKILL.md" ] \
+    || [ -f "$HOME/.codex/prompts/ce-setup.md" ] \
+    || find "$HOME/.codex" -maxdepth 6 -type f \( -path '*/compound-engineering/*/ce-setup/SKILL.md' -o -path '*/compound-engineering/.codex-plugin/plugin.json' \) 2>/dev/null | grep -q .
+}
+
 for tool in agent-browser gh jq vhs silicon ffmpeg ast-grep; do
   if command -v "$tool" >/dev/null 2>&1; then
     printf 'OK   %-14s %s\n' "$tool" "$(command -v "$tool")"
@@ -21,7 +30,7 @@ else
   missing=1
 fi
 
-if find "$HOME/.codex/skills" "$HOME/.codex/prompts" -maxdepth 4 -type f 2>/dev/null | grep -Eq '/ce-setup/|ce-setup'; then
+if compound_engineering_installed; then
   printf 'OK   %-14s %s\n' "CE plugin" "$HOME/.codex"
 else
   printf 'MISS %-14s\n' "CE plugin"

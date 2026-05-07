@@ -20,6 +20,15 @@ have() {
   command -v "$1" >/dev/null 2>&1
 }
 
+compound_engineering_installed() {
+  [ -f "$HOME/.codex/plugins/compound-engineering/.codex-plugin/plugin.json" ] \
+    || [ -f "$HOME/.codex/plugins/compound-engineering/plugin.json" ] \
+    || [ -f "$HOME/.codex/skills/compound-engineering/ce-setup/SKILL.md" ] \
+    || [ -f "$HOME/.codex/skills/ce-setup/SKILL.md" ] \
+    || [ -f "$HOME/.codex/prompts/ce-setup.md" ] \
+    || find "$HOME/.codex" -maxdepth 6 -type f \( -path '*/compound-engineering/*/ce-setup/SKILL.md' -o -path '*/compound-engineering/.codex-plugin/plugin.json' \) 2>/dev/null | grep -q .
+}
+
 as_root() {
   if [ "$(id -u)" -eq 0 ]; then
     "$@"
@@ -204,7 +213,7 @@ verify() {
     missing=1
   fi
 
-  if find "$HOME/.codex/skills" "$HOME/.codex/prompts" -maxdepth 4 -type f 2>/dev/null | grep -Eq '/ce-setup/|ce-setup'; then
+  if compound_engineering_installed; then
     printf 'OK   compound-engineering Codex install detected\n'
   else
     printf 'MISS compound-engineering Codex install not detected under ~/.codex\n'
