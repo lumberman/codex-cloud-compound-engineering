@@ -1,0 +1,30 @@
+# Compound Engineering in Codex Cloud
+
+## Compound Engineering Workflow
+
+- Use the installed Compound Engineering skills when the task matches them:
+  - `ce-brainstorm` for ambiguous requirements or approach discovery.
+  - `ce-plan` for implementation-ready plans.
+  - `ce-work` or `lfg` for executing a scoped engineering task.
+  - `ce-code-review` for review requests.
+  - `ce-debug` for bug investigation and root-cause work.
+  - `ce-commit` or `ce-commit-push-pr` for git handoff work.
+  - `ce-demo-reel`, `ce-test-browser`, or `ce-proof` when visual/user-facing proof is requested.
+- Prefer the repository's existing patterns and validation commands over generic defaults.
+- When a Compound Engineering skill asks for missing tools, first run:
+
+```bash
+bash verify.sh
+```
+
+- Expected CE helper tools in this cloud environment:
+  - `agent-browser`
+  - `gh`
+  - `jq`
+  - `vhs`
+  - `silicon`
+  - `ffmpeg`
+  - `ast-grep`
+  - the `ast-grep` agent skill
+- If browser proof is required and `agent-browser` is unavailable, report the missing dependency instead of claiming proof.
+- If a repo uses `.compound-engineering/config.local.yaml`, treat it as machine-local state and do not commit it.
