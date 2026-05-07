@@ -17,20 +17,27 @@ It installs:
 ## Use In Codex Cloud
 
 1. Open Codex settings, then create or edit a cloud environment.
-2. In the setup script field, paste the contents of `setup.sh`, or commit/copy this kit into a repo and use:
+2. In the setup script field, use this bootstrap command to pull the latest setup from GitHub:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/lumberman/codex-cloud-compound-engineering/main/setup-from-github.sh)"
+```
+
+3. Or paste the contents of `setup.sh` directly into the setup script field.
+4. If you commit/copy this kit into a repo instead, use:
 
 ```bash
 bash setup.sh
 ```
 
-3. In the optional maintenance script field, paste `maintenance.sh`, or use:
+5. In the optional maintenance script field, paste `maintenance.sh`, or use:
 
 ```bash
 bash maintenance.sh
 ```
 
-4. Add the contents of `AGENTS.md.snippet` to your repository root `AGENTS.md`.
-5. Start a Codex Cloud task and run this from the task terminal if you want to verify the environment:
+6. Add the contents of `AGENTS.md.snippet` to your repository root `AGENTS.md`.
+7. Start a Codex Cloud task and run this from the task terminal if you want to verify the environment:
 
 ```bash
 bash verify.sh
