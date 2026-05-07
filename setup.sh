@@ -21,7 +21,8 @@ have() {
 }
 
 compound_engineering_installed() {
-  [ -f "$HOME/.codex/plugins/compound-engineering/.codex-plugin/plugin.json" ] \
+  [ -f "$HOME/.codex/.compound-engineering-installed" ] \
+    || [ -f "$HOME/.codex/plugins/compound-engineering/.codex-plugin/plugin.json" ] \
     || [ -f "$HOME/.codex/plugins/compound-engineering/plugin.json" ] \
     || [ -f "$HOME/.codex/skills/compound-engineering/ce-setup/SKILL.md" ] \
     || [ -f "$HOME/.codex/skills/ce-setup/SKILL.md" ] \
@@ -192,6 +193,8 @@ install_compound_engineering() {
   install_bun
   log "Installing Compound Engineering plugin into Codex"
   bunx @every-env/compound-plugin install compound-engineering --to codex
+  mkdir -p "$HOME/.codex"
+  printf 'installed_at=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$HOME/.codex/.compound-engineering-installed"
 }
 
 verify() {

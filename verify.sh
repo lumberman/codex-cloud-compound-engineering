@@ -6,7 +6,8 @@ export PATH="$HOME/.bun/bin:$HOME/.npm-global/bin:$HOME/go/bin:$HOME/.cargo/bin:
 missing=0
 
 compound_engineering_installed() {
-  [ -f "$HOME/.codex/plugins/compound-engineering/.codex-plugin/plugin.json" ] \
+  [ -f "$HOME/.codex/.compound-engineering-installed" ] \
+    || [ -f "$HOME/.codex/plugins/compound-engineering/.codex-plugin/plugin.json" ] \
     || [ -f "$HOME/.codex/plugins/compound-engineering/plugin.json" ] \
     || [ -f "$HOME/.codex/skills/compound-engineering/ce-setup/SKILL.md" ] \
     || [ -f "$HOME/.codex/skills/ce-setup/SKILL.md" ] \
